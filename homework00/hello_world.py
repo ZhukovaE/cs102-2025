@@ -1,2 +1,7 @@
+"""Lab work1."""
 def text():
-    return message
+    """
+    Returns:
+        str: message.
+    """
+    return "message"
