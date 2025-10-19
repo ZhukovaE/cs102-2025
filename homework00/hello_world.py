@@ -1,4 +1,6 @@
 """Lab work1."""
+
+
 def text():
     """
     Returns:
