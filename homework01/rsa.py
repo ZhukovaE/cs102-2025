@@ -13,6 +13,15 @@ def is_prime(n: int) -> bool:
     False
     """
     # PUT YOUR CODE HERE
+    counter = 0
+    for i in range(1, n + 1):
+        b = n % i
+        if b == 0:
+            counter = counter + 1
+    if counter == 2:
+        return True
+    else:
+        return False
     pass
 
 
@@ -25,6 +34,11 @@ def gcd(a: int, b: int) -> int:
     1
     """
     # PUT YOUR CODE HERE
+    while b != 0:
+        mod = a % b
+        a = b
+        b = mod
+    return a
     pass
 
 
@@ -36,6 +50,9 @@ def multiplicative_inverse(e: int, phi: int) -> int:
     23
     """
     # PUT YOUR CODE HERE
+    for d in range(1, phi):
+        if (e * d) % phi == 1:
+            return d
     pass
 
 
@@ -47,10 +64,11 @@ def generate_keypair(p: int, q: int) -> tp.Tuple[tp.Tuple[int, int], tp.Tuple[in
 
     # n = pq
     # PUT YOUR CODE HERE
+    n = p * q
 
     # phi = (p-1)(q-1)
     # PUT YOUR CODE HERE
-
+    phi = (p-1) * (q-1)
     # Choose an integer e such that e and phi(n) are coprime
     e = random.randrange(1, phi)
 
