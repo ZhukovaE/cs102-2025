@@ -13,10 +13,10 @@ def encrypt_caesar(plaintext: str, shift: int = 3) -> str:
     ciphertext = ""
     # PUT YOUR CODE HERE
     for letter in plaintext:
-        if letter .islower():
-            ciphertext = ciphertext + chr(((ord(letter)-97+shift)%26)+97)
-        elif letter .isupper():
-            ciphertext = ciphertext + chr(((ord(letter)-65+shift)%26)+65)
+        if letter.islower():
+            ciphertext = ciphertext + chr(((ord(letter) - 97 + shift) % 26) + 97)
+        elif letter.isupper():
+            ciphertext = ciphertext + chr(((ord(letter) - 65 + shift) % 26) + 65)
         else:
             ciphertext = ciphertext + letter
     return ciphertext
