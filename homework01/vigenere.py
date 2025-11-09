@@ -19,8 +19,10 @@ def encrypt_vigenere(plaintext: str, keyword: str) -> str:
             shift = ord(key_letter) - ord("A")
         if letter.isupper():
             ciphertext = ciphertext + chr(((ord(letter) - 65 + shift) % 26) + 65)
-        else:
+        elif letter.islower():
             ciphertext = ciphertext + chr(((ord(letter) - 97 + shift) % 26) + 97)
+        else:
+            ciphertext = ciphertext + letter
     return ciphertext
 
 
@@ -33,6 +35,8 @@ def decrypt_vigenere(ciphertext: str, keyword: str) -> str:
     'python'
     >>> decrypt_vigenere("LXFOPVEFRNHR", "LEMON")
     'ATTACKATDAWN'
+    >>> decrypt_vigenere("tfvzzvwkeaqv lq aqvpzf", "lsci")
+    'introduction to python'
     """
     plaintext = ""
     # PUT YOUR CODE HERE
@@ -45,6 +49,8 @@ def decrypt_vigenere(ciphertext: str, keyword: str) -> str:
             shift = ord(key_letter) - ord("A")
         if letter.isupper():
             plaintext = plaintext + chr(((ord(letter) - 65 - shift) % 26) + 65)
-        else:
+        elif letter.islower():
             plaintext = plaintext + chr(((ord(letter) - 97 - shift) % 26) + 97)
+        else:
+            plaintext = plaintext + letter
     return plaintext

@@ -53,7 +53,7 @@ def multiplicative_inverse(e: int, phi: int) -> int:
     for d in range(1, phi):
         if (e * d) % phi == 1:
             return d
-    raise ValueError(f"Обратный элемент для e={e} по модулю phi={phi} не существует")
+    return 0
     pass
 
 
