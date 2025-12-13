@@ -1,5 +1,6 @@
 import pathlib
 import typing as tp
+import random
 
 T = tp.TypeVar("T")
 
@@ -41,7 +42,7 @@ def group(values: tp.List[T], n: int) -> tp.List[tp.List[T]]:
     >>> group([1,2,3,4,5,6,7,8,9], 3)
     [[1, 2, 3], [4, 5, 6], [7, 8, 9]]
     """
-    pass
+    return [values[i:i + n] for i in range(0, len(values), n)]
 
 
 def get_row(grid: tp.List[tp.List[str]], pos: tp.Tuple[int, int]) -> tp.List[str]:
@@ -53,7 +54,8 @@ def get_row(grid: tp.List[tp.List[str]], pos: tp.Tuple[int, int]) -> tp.List[str
     >>> get_row([['1', '2', '3'], ['4', '5', '6'], ['.', '8', '9']], (2, 0))
     ['.', '8', '9']
     """
-    pass
+    row_index = pos[0]
+    return grid[row_index]
 
 
 def get_col(grid: tp.List[tp.List[str]], pos: tp.Tuple[int, int]) -> tp.List[str]:
@@ -65,7 +67,10 @@ def get_col(grid: tp.List[tp.List[str]], pos: tp.Tuple[int, int]) -> tp.List[str
     >>> get_col([['1', '2', '3'], ['4', '5', '6'], ['.', '8', '9']], (0, 2))
     ['3', '6', '9']
     """
-    pass
+    result = []
+    for i in grid:
+        result.append(i[pos[1]])
+    return result
 
 
 def get_block(grid: tp.List[tp.List[str]], pos: tp.Tuple[int, int]) -> tp.List[str]:
@@ -78,7 +83,15 @@ def get_block(grid: tp.List[tp.List[str]], pos: tp.Tuple[int, int]) -> tp.List[s
     >>> get_block(grid, (8, 8))
     ['2', '8', '.', '.', '.', '5', '.', '7', '9']
     """
-    pass
+    row, col = pos
+    start_row = (row // 3) * 3
+    start_col = (col // 3) * 3
+
+    block = []
+    for i in range(start_row, start_row + 3):
+        for j in range(start_col, start_col + 3):
+            block.append(grid[i][j])
+    return block
 
 
 def find_empty_positions(grid: tp.List[tp.List[str]]) -> tp.Optional[tp.Tuple[int, int]]:
@@ -90,7 +103,10 @@ def find_empty_positions(grid: tp.List[tp.List[str]]) -> tp.Optional[tp.Tuple[in
     >>> find_empty_positions([['1', '2', '3'], ['4', '5', '6'], ['.', '8', '9']])
     (2, 0)
     """
-    pass
+    for i in grid:
+        for g in i:
+            if g == ".":
+                return (grid.index(i), i.index(g))
 
 
 def find_possible_values(grid: tp.List[tp.List[str]], pos: tp.Tuple[int, int]) -> tp.Set[str]:
@@ -103,7 +119,17 @@ def find_possible_values(grid: tp.List[tp.List[str]], pos: tp.Tuple[int, int]) -
     >>> values == {'2', '5', '9'}
     True
     """
-    pass
+    row_values = get_row(grid, pos)
+    col_values = get_col(grid, pos)
+    block_values = get_block(grid, pos)
+
+    used_values = set(row_values) | set(col_values) | set(block_values)
+
+    all_values = set("123456789")
+
+    possible = all_values - used_values
+
+    return possible
 
 
 def solve(grid: tp.List[tp.List[str]]) -> tp.Optional[tp.List[tp.List[str]]]:
@@ -118,13 +144,101 @@ def solve(grid: tp.List[tp.List[str]]) -> tp.Optional[tp.List[tp.List[str]]]:
     >>> solve(grid)
     [['5', '3', '4', '6', '7', '8', '9', '1', '2'], ['6', '7', '2', '1', '9', '5', '3', '4', '8'], ['1', '9', '8', '3', '4', '2', '5', '6', '7'], ['8', '5', '9', '7', '6', '1', '4', '2', '3'], ['4', '2', '6', '8', '5', '3', '7', '9', '1'], ['7', '1', '3', '9', '2', '4', '8', '5', '6'], ['9', '6', '1', '5', '3', '7', '2', '8', '4'], ['2', '8', '7', '4', '1', '9', '6', '3', '5'], ['3', '4', '5', '2', '8', '6', '1', '7', '9']]
     """
-    pass
+    empty = find_empty_positions(grid)
+
+    if empty is None:
+        return grid
+
+    row, col = empty
+
+    possible_values = find_possible_values(grid, empty)
+
+    for value in possible_values:
+
+        grid[row][col] = value
+
+        result = solve(grid)
+
+        if result is not None:
+            return result
+
+        grid[row][col] = '.'
+
+    return None
 
 
 def check_solution(solution: tp.List[tp.List[str]]) -> bool:
-    """ Если решение solution верно, то вернуть True, в противном случае False """
-    # TODO: Add doctests with bad puzzles
-    pass
+    """ Если решение solution верно, то вернуть True, в противном случае False
+    >> > correct_solution = [ \
+        ['5', '3', '4', '6', '7', '8', '9', '1', '2'], \
+        ['6', '7', '2', '1', '9', '5', '3', '4', '8'], \
+        ['1', '9', '8', '3', '4', '2', '5', '6', '7'], \
+        ['8', '5', '9', '7', '6', '1', '4', '2', '3'], \
+        ['4', '2', '6', '8', '5', '3', '7', '9', '1'], \
+        ['7', '1', '3', '9', '2', '4', '8', '5', '6'], \
+        ['9', '6', '1', '5', '3', '7', '2', '8', '4'], \
+        ['2', '8', '7', '4', '1', '9', '6', '3', '5'], \
+        ['3', '4', '5', '2', '8', '6', '1', '7', '9']]
+    >> > check_solution(correct_solution)
+    True
+
+    >> > wrong_solution1 = [ \
+        ['5', '3', '4', '6', '7', '8', '9', '1', '2'], \
+        ['6', '7', '2', '1', '9', '5', '3', '4', '8'], \
+        ['1', '9', '8', '3', '4', '2', '5', '6', '7'], \
+        ['8', '5', '9', '7', '6', '1', '4', '2', '3'], \
+        ['4', '2', '6', '8', '5', '3', '7', '9', '1'], \
+        ['7', '1', '3', '9', '2', '4', '8', '5', '6'], \
+        ['9', '6', '1', '5', '3', '7', '2', '8', '4'], \
+        ['2', '8', '7', '4', '1', '9', '6', '3', '5'], \
+        ['3', '4', '5', '2', '8', '6', '1', '7', '8']]  # последняя цифра должна быть 9, а не 8
+    >> > check_solution(wrong_solution1)
+    False
+
+    >> > wrong_solution2 = [ \
+        ['1', '2', '3', '4', '5', '6', '7', '8', '9'], \
+        ['1', '2', '3', '4', '5', '6', '7', '8', '9'], \
+        ['1', '2', '3', '4', '5', '6', '7', '8', '9'], \
+        ['1', '2', '3', '4', '5', '6', '7', '8', '9'], \
+        ['1', '2', '3', '4', '5', '6', '7', '8', '9'], \
+        ['1', '2', '3', '4', '5', '6', '7', '8', '9'], \
+        ['1', '2', '3', '4', '5', '6', '7', '8', '9'], \
+        ['1', '2', '3', '4', '5', '6', '7', '8', '9'], \
+        ['1', '2', '3', '4', '5', '6', '7', '8', '9']]  # все строки одинаковые
+    >> > check_solution(wrong_solution2)
+    False
+
+    >> > wrong_solution3 = [ \
+        ['5', '3', '4', '6', '7', '8', '9', '1', '2'], \
+        ['6', '7', '2', '1', '9', '5', '3', '4', '8'], \
+        ['1', '9', '8', '3', '4', '2', '5', '6', '7'], \
+        ['8', '5', '9', '7', '6', '1', '4', '2', '3'], \
+        ['4', '2', '6', '8', '5', '3', '7', '9', '1'], \
+        ['7', '1', '3', '9', '2', '4', '8', '5', '6'], \
+        ['9', '6', '1', '5', '3', '7', '2', '8', '4'], \
+        ['2', '8', '7', '4', '1', '9', '6', '3', '5'], \
+        ['3', '4', '5', '2', '8', '6', '1', '7', '.']]  # есть пустая клетка
+    >> > check_solution(wrong_solution3)
+    False
+    """
+
+    for i in range(9):
+        row = get_row(solution, (i, 0))
+        if set(row) != set("123456789"):
+            return False
+
+    for j in range(9):
+        col = get_col(solution, (0, j))
+        if set(col) != set("123456789"):
+            return False
+
+    for i in range(0, 9, 3):
+        for j in range(0, 9, 3):
+            block = get_block(solution, (i, j))
+            if set(block) != set("123456789"):
+                return False
+
+    return True
 
 
 def generate_sudoku(N: int) -> tp.List[tp.List[str]]:
@@ -148,7 +262,60 @@ def generate_sudoku(N: int) -> tp.List[tp.List[str]]:
     >>> check_solution(solution)
     True
     """
-    pass
+    N = max(0, min(N, 81))
+
+    base = [
+        ['5', '3', '4', '6', '7', '8', '9', '1', '2'],
+        ['6', '7', '2', '1', '9', '5', '3', '4', '8'],
+        ['1', '9', '8', '3', '4', '2', '5', '6', '7'],
+        ['8', '5', '9', '7', '6', '1', '4', '2', '3'],
+        ['4', '2', '6', '8', '5', '3', '7', '9', '1'],
+        ['7', '1', '3', '9', '2', '4', '8', '5', '6'],
+        ['9', '6', '1', '5', '3', '7', '2', '8', '4'],
+        ['2', '8', '7', '4', '1', '9', '6', '3', '5'],
+        ['3', '4', '5', '2', '8', '6', '1', '7', '9']
+    ]
+
+    digits = list("123456789")
+    random.shuffle(digits)
+    digit_map = {str(i + 1): digits[i] for i in range(9)}
+
+    grid = []
+    for i in range(9):
+        row = []
+        for j in range(9):
+            row.append(digit_map[base[i][j]])
+        grid.append(row)
+
+    for block in range(3):
+        rows = list(range(block * 3, block * 3 + 3))
+        random.shuffle(rows)
+        # Меняем строки местами
+        for k in range(3):
+            row1 = block * 3 + k
+            row2 = rows[k]
+            grid[row1], grid[row2] = grid[row2], grid[row1]
+
+    for block in range(3):
+        cols = list(range(block * 3, block * 3 + 3))
+        random.shuffle(cols)
+
+        for k in range(3):
+            col1 = block * 3 + k
+            col2 = cols[k]
+            for row in range(9):
+                grid[row][col1], grid[row][col2] = grid[row][col2], grid[row][col1]
+
+    cells_to_remove = 81 - N
+
+    all_positions = [(r, c) for r in range(9) for c in range(9)]
+    random.shuffle(all_positions)
+
+    for i in range(min(cells_to_remove, 81)):
+        r, c = all_positions[i]
+        grid[r][c] = '.'
+
+    return grid
 
 
 if __name__ == "__main__":
