@@ -23,13 +23,9 @@ class GUI(UI):
 
     def draw_lines(self) -> None:
         for x in range(0, self.width, self.cell_size):
-            pygame.draw.line(
-                self.screen, pygame.Color("black"), (x, 0), (x, self.height)
-            )
+            pygame.draw.line(self.screen, pygame.Color("black"), (x, 0), (x, self.height))
         for y in range(0, self.height, self.cell_size):
-            pygame.draw.line(
-                self.screen, pygame.Color("black"), (0, y), (self.width, y)
-            )
+            pygame.draw.line(self.screen, pygame.Color("black"), (0, y), (self.width, y))
         pass
 
     def draw_grid(self) -> None:
@@ -51,11 +47,7 @@ class GUI(UI):
         paused = False  # Флаг для паузы
 
         running = True
-        while (
-            running
-            and self.life.is_changing
-            and not self.life.is_max_generations_exceeded
-        ):
+        while running and self.life.is_changing and not self.life.is_max_generations_exceeded:
 
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
@@ -71,9 +63,7 @@ class GUI(UI):
                     row = y // self.cell_size
                     if 0 <= row < self.life.rows and 0 <= col < self.life.cols:
                         # Инвертирую состояние клетки
-                        self.life.curr_generation[row][col] = (
-                            1 - self.life.curr_generation[row][col]
-                        )
+                        self.life.curr_generation[row][col] = 1 - self.life.curr_generation[row][col]
 
             # Очищаю экран
             self.screen.fill(pygame.Color("white"))
@@ -87,9 +77,7 @@ class GUI(UI):
             # Отображаю статус паузы
             if paused:
                 font = pygame.font.SysFont(None, 36)
-                text = font.render(
-                    "PAUSED (SPACE to resume)", True, pygame.Color("red")
-                )
+                text = font.render("PAUSED (SPACE to resume)", True, pygame.Color("red"))
                 self.screen.blit(text, (10, 10))
                 hint = font.render("Click cells to toggle", True, pygame.Color("blue"))
                 self.screen.blit(hint, (10, 50))
