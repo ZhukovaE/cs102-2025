@@ -12,10 +12,10 @@ Grid = tp.List[Cells]
 
 class GameOfLife:
     def __init__(
-            self,
-            size: tp.Tuple[int, int],
-            randomize: bool = True,
-            max_generations: tp.Optional[float] = float("inf"),
+        self,
+        size: tp.Tuple[int, int],
+        randomize: bool = True,
+        max_generations: tp.Optional[float] = float("inf"),
     ) -> None:
         # Размер клеточного поля
         self.rows, self.cols = size
@@ -97,6 +97,8 @@ class GameOfLife:
         """
         Не превысило ли текущее число поколений максимально допустимое.
         """
+        if self.max_generations is None:
+            return False  # Если нет ограничения, то никогда не превышено
         return self.generations >= self.max_generations
 
     @property
@@ -111,7 +113,7 @@ class GameOfLife:
         """
         Прочитать состояние клеток из указанного файла.
         """
-        with open(filename, 'r') as f:
+        with open(filename, "r") as f:
             lines = f.readlines()
             # Определяю размеры сетки
             rows = len(lines)
@@ -135,8 +137,8 @@ class GameOfLife:
         """
         Сохранить текущее состояние клеток в указанный файл.
         """
-        with open(filename, 'w') as f:
+        with open(filename, "w") as f:
             for row in self.curr_generation:
                 # Преобразую числа в строки и объединяю
-                line = ''.join(str(cell) for cell in row)
-                f.write(line + '\n')
+                line = "".join(str(cell) for cell in row)
+                f.write(line + "\n")

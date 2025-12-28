@@ -11,7 +11,7 @@ Grid = tp.List[Cells]
 
 class GameOfLife:
     def __init__(
-            self, width: int = 640, height: int = 480, cell_size: int = 10, speed: int = 10
+        self, width: int = 640, height: int = 480, cell_size: int = 10, speed: int = 10
     ) -> None:
         self.width = width
         self.height = height
@@ -32,39 +32,43 @@ class GameOfLife:
         self.grid = self.create_grid(randomize=True)
 
     def draw_lines(self) -> None:
-        """ Отрисовать сетку """
+        """Отрисовать сетку"""
         for x in range(0, self.width, self.cell_size):
-            pygame.draw.line(self.screen, pygame.Color("black"), (x, 0), (x, self.height))
+            pygame.draw.line(
+                self.screen, pygame.Color("black"), (x, 0), (x, self.height)
+            )
         for y in range(0, self.height, self.cell_size):
-            pygame.draw.line(self.screen, pygame.Color("black"), (0, y), (self.width, y))
+            pygame.draw.line(
+                self.screen, pygame.Color("black"), (0, y), (self.width, y)
+            )
 
-    def run(self) -> None:
-        """ Запустить игру """
+    def run(self, grid: Grid) -> None:
+        """Запустить игру"""
         pygame.init()
         clock = pygame.time.Clock()
         pygame.display.set_caption("Game of Life")
         self.screen.fill(pygame.Color("white"))
 
-        # Создание списка клеток
-        grid = self.create_grid(randomize=True)
+        # Создаю списка клеток
+        self.grid = self.create_grid(randomize=True)
 
         running = True
         while running:
             for event in pygame.event.get():
-                if event.type == QUIT:
+                if event.type == pygame.QUIT:
                     running = False
 
-            # Очищаем экран каждый кадр
+            # Очищаю экран каждый кадр
             self.screen.fill(pygame.Color("white"))
 
-            # Рисуем сетку
+            # Рисую сетку
             self.draw_lines()
 
             # Отрисовка списка клеток
-            self.draw_grid(grid)
+            self.draw_grid()
 
-            # Выполнение одного шага игры (обновление состояния ячеек)
-            self.grid = self.get_next_generation(grid)
+            # Выполненяю один шаг игры
+            self.grid = self.get_next_generation()
 
             pygame.display.flip()
             clock.tick(self.speed)
@@ -112,9 +116,9 @@ class GameOfLife:
             for col in range(self.cell_width):  # Прохожу по всем столбцам
                 # Определяю цвет в зависимости от состояния клетки
                 if self.grid[row][col] == 1:  # Если клетка живая
-                    color = pygame.Color('green')
+                    color = pygame.Color("green")
                 else:  # Если клетка мертвая
-                    color = pygame.Color('white')
+                    color = pygame.Color("white")
 
                 # Вычисляю координаты прямоугольника для клетки
                 x = col * self.cell_size  # X-координата = номер столбца * размер клетки
@@ -148,8 +152,16 @@ class GameOfLife:
         neighbours = []  # Список для хранения соседей
 
         # Проверяю все 8 возможных направлений
-        for delta_row in [-1, 0, 1]:  # Изменение по строке: -1 (вверх), 0 (та же строка), 1 (вниз)
-            for delta_column in [-1, 0, 1]:  # Изменение по столбцу: -1 (влево), 0 (тот же столбец), 1 (вправо)
+        for delta_row in [
+            -1,
+            0,
+            1,
+        ]:  # Изменение по строке: -1 (вверх), 0 (та же строка), 1 (вниз)
+            for delta_column in [
+                -1,
+                0,
+                1,
+            ]:  # Изменение по столбцу: -1 (влево), 0 (тот же столбец), 1 (вправо)
                 # Пропускаю саму клетку (когда delta_row=0 и delta_column=0)
                 if delta_row == 0 and delta_column == 0:
                     continue

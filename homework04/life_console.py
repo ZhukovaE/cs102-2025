@@ -9,11 +9,11 @@ class Console(UI):
         super().__init__(life)
 
     def draw_borders(self, screen) -> None:
-        """ Отобразить рамку. """
+        """Отобразить рамку."""
         screen.border()
 
     def draw_grid(self, screen) -> None:
-        """ Отобразить состояние клеток. """
+        """Отобразить состояние клеток."""
         # Очищаю экран
         screen.clear()
 
@@ -30,12 +30,12 @@ class Console(UI):
                 if self.life.curr_generation[i][j] == 1:
                     try:
                         # +4 чтобы было под информацией, +1 из-за левой рамки
-                        screen.addch(i + 4, j + 1, '#')
+                        screen.addch(i + 4, j + 1, "#")
                     except curses.error:
                         pass  # Если не помещается
                 else:
                     try:
-                        screen.addch(i + 4, j + 1, ' ')
+                        screen.addch(i + 4, j + 1, " ")
                     except curses.error:
                         pass
 
@@ -47,15 +47,14 @@ class Console(UI):
             screen.nodelay(True)  # Неблокирующий ввод
 
             # Игровой цикл
-            while (self.life.is_changing and
-                   not self.life.is_max_generations_exceeded):
+            while self.life.is_changing and not self.life.is_max_generations_exceeded:
 
                 # Рисую игру
                 self.draw_grid(screen)
                 screen.refresh()
 
                 # Проверяю нажатие 'q'
-                if screen.getch() == ord('q'):
+                if screen.getch() == ord("q"):
                     break
 
                 # Делаю шаг игры

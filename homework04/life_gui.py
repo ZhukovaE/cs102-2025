@@ -1,6 +1,7 @@
 import pygame
 from life import GameOfLife
-from pygame.locals import *
+
+# from pygame.locals import *
 from ui import UI
 
 
@@ -22,20 +23,22 @@ class GUI(UI):
 
     def draw_lines(self) -> None:
         for x in range(0, self.width, self.cell_size):
-            pygame.draw.line(self.screen, pygame.Color("black"),
-                             (x, 0), (x, self.height))
+            pygame.draw.line(
+                self.screen, pygame.Color("black"), (x, 0), (x, self.height)
+            )
         for y in range(0, self.height, self.cell_size):
-            pygame.draw.line(self.screen, pygame.Color("black"),
-                             (0, y), (self.width, y))
+            pygame.draw.line(
+                self.screen, pygame.Color("black"), (0, y), (self.width, y)
+            )
         pass
 
     def draw_grid(self) -> None:
         for row in range(self.life.rows):
             for col in range(self.life.cols):
                 if self.life.curr_generation[row][col] == 1:
-                    color = pygame.Color('green')
+                    color = pygame.Color("green")
                 else:
-                    color = pygame.Color('white')
+                    color = pygame.Color("white")
 
                 x = col * self.cell_size
                 y = row * self.cell_size
@@ -48,25 +51,29 @@ class GUI(UI):
         paused = False  # Флаг для паузы
 
         running = True
-        while (running and
-               self.life.is_changing and
-               not self.life.is_max_generations_exceeded):
+        while (
+            running
+            and self.life.is_changing
+            and not self.life.is_max_generations_exceeded
+        ):
 
             for event in pygame.event.get():
-                if event.type == QUIT:
+                if event.type == pygame.QUIT:
                     running = False
-                elif event.type == KEYDOWN:
-                    if event.key == K_SPACE:  # Пробел - пауза/продолжение
+                elif event.type == pygame.KEYDOWN:
+                    if event.key == pygame.K_SPACE:  # Пробел - пауза/продолжение
                         paused = not paused
-                    elif event.key == K_q:  # Q - выход
+                    elif event.key == pygame.K_q:  # Q - выход
                         running = False
-                elif event.type == MOUSEBUTTONDOWN and paused:  # Клики при паузе
+                elif event.type == pygame.MOUSEBUTTONDOWN and paused:  # Клики при паузе
                     x, y = pygame.mouse.get_pos()
                     col = x // self.cell_size
                     row = y // self.cell_size
                     if 0 <= row < self.life.rows and 0 <= col < self.life.cols:
                         # Инвертирую состояние клетки
-                        self.life.curr_generation[row][col] = 1 - self.life.curr_generation[row][col]
+                        self.life.curr_generation[row][col] = (
+                            1 - self.life.curr_generation[row][col]
+                        )
 
             # Очищаю экран
             self.screen.fill(pygame.Color("white"))
@@ -80,9 +87,11 @@ class GUI(UI):
             # Отображаю статус паузы
             if paused:
                 font = pygame.font.SysFont(None, 36)
-                text = font.render("PAUSED (SPACE to resume)", True, pygame.Color('red'))
+                text = font.render(
+                    "PAUSED (SPACE to resume)", True, pygame.Color("red")
+                )
                 self.screen.blit(text, (10, 10))
-                hint = font.render("Click cells to toggle", True, pygame.Color('blue'))
+                hint = font.render("Click cells to toggle", True, pygame.Color("blue"))
                 self.screen.blit(hint, (10, 50))
             else:
                 # Выполняю шаг игры только если не на паузе
