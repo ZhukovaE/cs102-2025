@@ -256,10 +256,10 @@ def generate_sudoku(N: int) -> tp.List[tp.List[str]]:
     """
     count = max(0, min(N, 81))
 
-    # Генерируем базовое решение алгоритмически
-    base = []
+    # Генерирую базовое решение алгоритмически
+    base: tp.List[tp.List[str]] = []
     for row in range(9):
-        base_row = []
+        base_row: tp.List[str] = []
         for col in range(9):
             # Формула для создания валидного судоку
             value = (row * 3 + row // 3 + col) % 9 + 1
@@ -271,37 +271,43 @@ def generate_sudoku(N: int) -> tp.List[tp.List[str]]:
     random.shuffle(digits)
     digit_map = {str(i + 1): digits[i] for i in range(9)}
 
-    # Применяем перестановку к базовому решению
-    grid = []
+    # Применяю перестановку к базовому решению
+    grid: tp.List[tp.List[str]] = []
     for row in range(9):
-        new_row = []
+        new_row: tp.List[str] = []
         for col in range(9):
             new_row.append(digit_map[base[row][col]])
         grid.append(new_row)
 
-    # Перемешиваем строки внутри вертикальных блоков
+    # Перемешиваю строки внутри вертикальных блоков
     for block in range(3):
         rows_in_block = list(range(block * 3, block * 3 + 3))
         random.shuffle(rows_in_block)
 
         for position in range(3):
-            current_row = block * 3 + position
-            new_row = rows_in_block[position]
-            grid[current_row], grid[new_row] = grid[new_row], grid[current_row]
+            current_row_index = block * 3 + position
+            new_row_index = rows_in_block[position]
+            # Меняю целые строки местами
+            temp_row = grid[current_row_index]
+            grid[current_row_index] = grid[new_row_index]
+            grid[new_row_index] = temp_row
 
-    # Перемешиваем столбцы внутри горизонтальных блоков
+    # Перемешиваю столбцы внутри горизонтальных блоков
     for block in range(3):
         cols_in_block = list(range(block * 3, block * 3 + 3))
         random.shuffle(cols_in_block)
 
         for position in range(3):
-            current_col = block * 3 + position
-            new_col = cols_in_block[position]
-            if current_col != new_col:
-                for row in grid:
-                    row[current_col], row[new_col] = row[new_col], row[current_col]
+            current_col_index = block * 3 + position
+            new_col_index = cols_in_block[position]
+            if current_col_index != new_col_index:
+                for row_index in range(9):
+                    # Меняю значения в столбцах
+                    temp_value = grid[row_index][current_col_index]
+                    grid[row_index][current_col_index] = grid[row_index][new_col_index]
+                    grid[row_index][new_col_index] = temp_value
 
-    # Удаляем ячейки для создания головоломки
+    # Удаляю ячейки для создания головоломки
     cells_to_remove = 81 - count
 
     all_positions = [(row, col) for row in range(9) for col in range(9)]
