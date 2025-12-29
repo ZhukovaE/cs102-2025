@@ -63,9 +63,7 @@ def get_col(grid: tp.List[tp.List[str]], pos: tp.Tuple[int, int]) -> tp.List[str
     >>> get_col([['1', '2', '3'], ['4', '5', '6'], ['.', '8', '9']], (0, 2))
     ['3', '6', '9']
     """
-    result = []
-    for i in grid:
-        result.append(i[pos[1]])
+    result = [i[pos[1]] for i in grid]
     return result
 
 
@@ -99,10 +97,10 @@ def find_empty_positions(grid: tp.List[tp.List[str]]) -> tp.Optional[tp.Tuple[in
     >>> find_empty_positions([['1', '2', '3'], ['4', '5', '6'], ['.', '8', '9']])
     (2, 0)
     """
-    for i in grid:
-        for g in i:
-            if g == ".":
-                return (grid.index(i), i.index(g))
+    for row in range(len(grid)):
+        for col in range(len(grid[row])):
+            if grid[row][col] == ".":
+                return (row, col)
     return None
 
 
@@ -121,11 +119,8 @@ def find_possible_values(grid: tp.List[tp.List[str]], pos: tp.Tuple[int, int]) -
     block_values = get_block(grid, pos)
 
     used_values = set(row_values) | set(col_values) | set(block_values)
-
     all_values = set("123456789")
-
     possible = all_values - used_values
-
     return possible
 
 
@@ -156,7 +151,7 @@ def solve(grid: tp.List[tp.List[str]]) -> tp.Optional[tp.List[tp.List[str]]]:
 
         result = solve(grid)
 
-        if result is not None:
+        if result:
             return result
 
         grid[row][col] = "."
@@ -219,19 +214,19 @@ def check_solution(solution: tp.List[tp.List[str]]) -> bool:
     False
     """
 
-    for i in range(9):
-        row = get_row(solution, (i, 0))
-        if set(row) != set("123456789"):
+    for row in range(9):
+        current_row = get_row(solution, (row, 0))
+        if set(current_row) != set("123456789"):
             return False
 
-    for j in range(9):
-        col = get_col(solution, (0, j))
-        if set(col) != set("123456789"):
+    for col in range(9):
+        current_col = get_col(solution, (0, col))
+        if set(current_col) != set("123456789"):
             return False
 
-    for i in range(0, 9, 3):
-        for j in range(0, 9, 3):
-            block = get_block(solution, (i, j))
+    for row in range(0, 9, 3):
+        for col in range(0, 9, 3):
+            block = get_block(solution, (row, col))
             if set(block) != set("123456789"):
                 return False
 
@@ -261,57 +256,60 @@ def generate_sudoku(N: int) -> tp.List[tp.List[str]]:
     """
     count = max(0, min(N, 81))
 
-    base = [
-        ["5", "3", "4", "6", "7", "8", "9", "1", "2"],
-        ["6", "7", "2", "1", "9", "5", "3", "4", "8"],
-        ["1", "9", "8", "3", "4", "2", "5", "6", "7"],
-        ["8", "5", "9", "7", "6", "1", "4", "2", "3"],
-        ["4", "2", "6", "8", "5", "3", "7", "9", "1"],
-        ["7", "1", "3", "9", "2", "4", "8", "5", "6"],
-        ["9", "6", "1", "5", "3", "7", "2", "8", "4"],
-        ["2", "8", "7", "4", "1", "9", "6", "3", "5"],
-        ["3", "4", "5", "2", "8", "6", "1", "7", "9"],
-    ]
+    # Генерируем базовое решение алгоритмически
+    base = []
+    for row in range(9):
+        base_row = []
+        for col in range(9):
+            # Формула для создания валидного судоку
+            value = (row * 3 + row // 3 + col) % 9 + 1
+            base_row.append(str(value))
+        base.append(base_row)
 
+    # Случайная перестановка цифр
     digits = list("123456789")
     random.shuffle(digits)
     digit_map = {str(i + 1): digits[i] for i in range(9)}
 
+    # Применяем перестановку к базовому решению
     grid = []
-    for i in range(9):
-        row = []
-        for j in range(9):
-            row.append(digit_map[base[i][j]])
-        grid.append(row)
+    for row in range(9):
+        new_row = []
+        for col in range(9):
+            new_row.append(digit_map[base[row][col]])
+        grid.append(new_row)
 
+    # Перемешиваем строки внутри вертикальных блоков
     for block in range(3):
-        rows = list(range(block * 3, block * 3 + 3))
-        random.shuffle(rows)
-        # Меняем строки местами
-        for k in range(3):
-            row1 = block * 3 + k
-            row2 = rows[k]
-            grid[row1], grid[row2] = grid[row2], grid[row1]
+        rows_in_block = list(range(block * 3, block * 3 + 3))
+        random.shuffle(rows_in_block)
 
+        for position in range(3):
+            current_row = block * 3 + position
+            new_row = rows_in_block[position]
+            grid[current_row], grid[new_row] = grid[new_row], grid[current_row]
+
+    # Перемешиваем столбцы внутри горизонтальных блоков
     for block in range(3):
-        cols = list(range(block * 3, block * 3 + 3))
-        random.shuffle(cols)
+        cols_in_block = list(range(block * 3, block * 3 + 3))
+        random.shuffle(cols_in_block)
 
-        for k in range(3):
-            col1 = block * 3 + k
-            col2 = cols[k]
-            if col1 != col2:
+        for position in range(3):
+            current_col = block * 3 + position
+            new_col = cols_in_block[position]
+            if current_col != new_col:
                 for row in grid:
-                    row[col1], row[col2] = row[col2], row[col1]
+                    row[current_col], row[new_col] = row[new_col], row[current_col]
 
+    # Удаляем ячейки для создания головоломки
     cells_to_remove = 81 - count
 
-    all_positions = [(r, c) for r in range(9) for c in range(9)]
+    all_positions = [(row, col) for row in range(9) for col in range(9)]
     random.shuffle(all_positions)
 
-    for i in range(min(cells_to_remove, 81)):
-        r, c = all_positions[i]
-        grid[r][c] = "."
+    for cell_index in range(min(cells_to_remove, 81)):
+        row, col = all_positions[cell_index]
+        grid[row][col] = "."
 
     return grid
 
