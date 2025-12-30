@@ -99,9 +99,9 @@ def make_step(grid: List[List[Union[str, int]]], k: int) -> List[List[Union[str,
     """
     new_grid = [row.copy() for row in grid]
 
-    for i in range(len(grid)):
-        for j in range(len(grid[0])):
-            if grid[i][j] == k:
+    for i, row in enumerate(grid):
+        for j, cell in enumerate(row):
+            if cell == k:
 
                 if i > 0 and grid[i - 1][j] == 0:
                     new_grid[i - 1][j] = k + 1
@@ -119,7 +119,7 @@ def make_step(grid: List[List[Union[str, int]]], k: int) -> List[List[Union[str,
 
 
 def shortest_path(
-    grid: List[List[Union[str, int]]], exit_coord: Tuple[int, int]
+        grid: List[List[Union[str, int]]], exit_coord: Tuple[int, int]
 ) -> Optional[Union[Tuple[int, int], List[Tuple[int, int]]]]:
     """
 
@@ -187,46 +187,35 @@ def encircled_exit(grid: List[List[Union[str, int]]], coord: Tuple[int, int]) ->
     cols = len(grid[0])
 
     if x == 0 and y == 0:
-        if grid[x][y + 1] == "■" and grid[x + 1][y] == "■":
-            return True
-        else:
-            return False
+        return grid[x][y + 1] == "■" and grid[x + 1][y] == "■"
+
     elif x == 0 and y == cols - 1:
-        if grid[0][cols - 2] == "■" and grid[1][cols - 1] == "■":
-            return True
-        return False
+        return grid[0][cols - 2] == "■" and grid[1][cols - 1] == "■"
+
     elif x == rows - 1 and y == 0:
-        if grid[rows - 1][1] == "■" and grid[rows - 2][0] == "■":
-            return True
-        return False
+        return grid[rows - 1][1] == "■" and grid[rows - 2][0] == "■"
+
     elif x == rows - 1 and y == cols - 1:
-        if grid[rows - 1][cols - 2] == "■" and grid[rows - 2][cols - 1] == "■":
-            return True
-        return False
+        return grid[rows - 1][cols - 2] == "■" and grid[rows - 2][cols - 1] == "■"
+
     elif x == 0:
-        if grid[0][y - 1] == "■" and grid[0][y + 1] == "■" and grid[1][y] == "■":
-            return True
-        return False
+        return grid[0][y - 1] == "■" and grid[0][y + 1] == "■" and grid[1][y] == "■"
+
     elif x == rows - 1:
-        if grid[rows - 1][y - 1] == "■" and grid[rows - 1][y + 1] == "■" and grid[rows - 2][y] == "■":
-            return True
-        return False
+        return grid[rows - 1][y - 1] == "■" and grid[rows - 1][y + 1] == "■" and grid[rows - 2][y] == "■"
+
     elif y == 0:
-        if grid[x - 1][0] == "■" and grid[x + 1][0] == "■" and grid[x][1] == "■":
-            return True
-        return False
+        return grid[x - 1][0] == "■" and grid[x + 1][0] == "■" and grid[x][1] == "■"
+
     elif y == cols - 1:
-        if grid[x - 1][cols - 1] == "■" and grid[x + 1][cols - 1] == "■" and grid[x][cols - 2] == "■":
-            return True
-        return False
+        return grid[x - 1][cols - 1] == "■" and grid[x + 1][cols - 1] == "■" and grid[x][cols - 2] == "■"
+
     else:
-        if 0 < x < rows - 1 and 0 < y < cols - 1:
-            return False
-    return False
+        return False
 
 
 def solve_maze(
-    grid: List[List[Union[str, int]]],
+        grid: List[List[Union[str, int]]],
 ) -> Tuple[List[List[Union[str, int]]], Optional[Union[Tuple[int, int], List[Tuple[int, int]]]]]:
     """
 
@@ -235,14 +224,8 @@ def solve_maze(
     """
     exits = get_exits(grid)
 
-    if len(exits) == 0:
-        return grid, None
-
-    if len(exits) == 1:
-        return grid, exits[0]
-
     if len(exits) != 2:
-        return grid, None
+        return grid, None if len(exits) != 1 else exits[0]
 
     exit1, exit2 = exits[0], exits[1]
 
@@ -251,11 +234,9 @@ def solve_maze(
 
     wave_grid = [row.copy() for row in grid]
 
-    for i in range(len(wave_grid)):
-        for j in range(len(wave_grid[0])):
-            if wave_grid[i][j] == " ":
-                wave_grid[i][j] = 0
-            elif wave_grid[i][j] == "X":
+    for i, row in enumerate(wave_grid):
+        for j, cell in enumerate(row):
+            if cell == " " or cell == "X":
                 wave_grid[i][j] = 0
 
     wave_grid[exit1[0]][exit1[1]] = 1
@@ -276,7 +257,7 @@ def solve_maze(
 
 
 def add_path_to_grid(
-    grid: List[List[Union[str, int]]], path: Optional[Union[Tuple[int, int], List[Tuple[int, int]]]]
+        grid: List[List[Union[str, int]]], path: Optional[Union[Tuple[int, int], List[Tuple[int, int]]]]
 ) -> List[List[Union[str, int]]]:
     """
 
